@@ -11,6 +11,7 @@ export class AllExceptionFilter implements ExceptionFilter{
         let status = HttpStatus.INTERNAL_SERVER_ERROR;
         let message = 'Something went wrong';
         let error = {}
+        let errorStack = {}
 
         if(exception instanceof HttpException){
             status = exception.getStatus();
@@ -20,12 +21,14 @@ export class AllExceptionFilter implements ExceptionFilter{
             typeof exceptionResponse === 'object' && 'error' in exceptionResponse
               ? (exceptionResponse as any).error
               : exception.name;
+              errorStack = exception.stack ?? ""
         }
         response
       .status(status)
       .json({
         success: false,
         message: message,
+        errorStack: errorStack,
         data: {},
         error: error,
         timestamp: new Date().toISOString()
