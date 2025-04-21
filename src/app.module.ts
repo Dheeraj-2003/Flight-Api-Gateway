@@ -9,6 +9,7 @@ import { UserController } from './controllers/user.controller';
 import { AuthController } from './controllers/auth.controller';
 import { JwtStrategy } from './guards/strategies/jwt.strategy';
 import { FlightGatewayController } from './controllers/flight.controller';
+import { BookingGatewayController } from './controllers/booking.controller';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { FlightGatewayController } from './controllers/flight.controller';
       }
     ])
   ],
-  controllers: [AppController, UserController, AuthController, FlightGatewayController],
+  controllers: [AppController, UserController, AuthController, FlightGatewayController, BookingGatewayController],
   providers: [AppService, JwtStrategy],
 })
 export class AppModule {}

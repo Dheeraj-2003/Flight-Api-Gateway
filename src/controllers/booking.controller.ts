@@ -1,7 +1,7 @@
-import {Controller, Post, Body, Headers, HttpCode, HttpStatus, Req, Res, All,  UseGuards,} from '@nestjs/common';
+import {Controller, Post, Body, Headers, HttpCode, HttpStatus, Req, Res, All,  UseGuards, Request} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
   
@@ -18,9 +18,12 @@ export class BookingGatewayController {
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
-    async forwardCreateBooking(@Body() body: any, @Res() res: Response) {
+    async forwardCreateBooking(@Body() body: any, @Res() res: Response, @Request() req) {
         const result = await firstValueFrom(
-        this.httpService.post(`${this.bookingServiceUrl}/booking`, body, { validateStatus: () => true })
+        this.httpService.post(`${this.bookingServiceUrl}/booking`, {
+            "userId": req.user.userId,
+            ...body
+        }, { validateStatus: () => true })
         );
         res.status(result.status).json(result.data);
     }
@@ -30,10 +33,14 @@ export class BookingGatewayController {
     async forwardPayment(
         @Body() body: any,
         @Headers('x-idempotent-key') key: string,
+        @Request() req,
         @Res() res: Response
     ) {
         const result = await firstValueFrom(
-        this.httpService.post(`${this.bookingServiceUrl}/booking/payment`, body, {
+        this.httpService.post(`${this.bookingServiceUrl}/booking/payment`,  {
+            "userId": req.user.userId,
+            ...body
+        }, {
             headers: {
             'x-idempotent-key': key,
             },
