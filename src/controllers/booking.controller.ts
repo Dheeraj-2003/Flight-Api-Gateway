@@ -1,17 +1,20 @@
-import {Controller,Post,Body,Headers,HttpCode,HttpStatus,Req,Res,All,} from '@nestjs/common';
+import {Controller, Post, Body, Headers, HttpCode, HttpStatus, Req, Res, All,  UseGuards,} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
   
 @Controller('booking')
+@UseGuards(JwtAuthGuard)
 export class BookingGatewayController {
     constructor(
         private readonly httpService: HttpService,
         private readonly configService: ConfigService
     ) {}
 
-    private bookingServiceUrl = this.configService.get<string>('BOOKING_SERVICE_URL');
+    private bookingServiceBaseUrl = this.configService.get<string>('BOOKING_SERVICE_URL');
+    private bookingServiceUrl = `${this.bookingServiceBaseUrl}/api`;
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
