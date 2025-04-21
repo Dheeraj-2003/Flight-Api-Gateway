@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
+import { RoleGuard } from 'src/guards/role.guard';
+import { ROLE } from 'src/common/role.enum';
   
 @Controller('flight')
 @UseGuards(JwtAuthGuard)
@@ -18,6 +20,7 @@ export class FlightGatewayController {
     private flightServiceUrl = `${this.flightServiceBaseUrl}/api`;
 
   @Post()
+  @UseGuards(new RoleGuard(ROLE.ADMIN))
   @HttpCode(HttpStatus.CREATED)
   async createFlight(@Body() body: any, @Res() res: Response) {
     const result = await firstValueFrom(
@@ -44,6 +47,7 @@ export class FlightGatewayController {
   }
 
   @Delete(':id')
+  @UseGuards(new RoleGuard(ROLE.ADMIN))
   @HttpCode(HttpStatus.OK)
   async deleteFlightById(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
     const result = await firstValueFrom(
@@ -53,6 +57,7 @@ export class FlightGatewayController {
   }
 
   @Patch(':id/seats')
+  @UseGuards(new RoleGuard(ROLE.ADMIN))
   async updateSeats(@Param('id', ParseIntPipe) id: number, @Body() body: any, @Res() res: Response) {
     const result = await firstValueFrom(
       this.httpService.patch(`${this.flightServiceUrl}/flight/${id}/seats`, body, { validateStatus: () => true })

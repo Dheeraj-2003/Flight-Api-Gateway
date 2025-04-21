@@ -3,7 +3,9 @@ import { Controller, Inject, Get, UseGuards, Param, Request,ParseIntPipe, Post, 
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { USER_SERVICE } from 'src/common/constants';
+import { ROLE } from 'src/common/role.enum';
 import { JwtAuthGuard } from 'src/guards/jwtAuth.guard';
+import { RoleGuard } from 'src/guards/role.guard';
   
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -11,6 +13,7 @@ export class UserController {
   constructor(@Inject(USER_SERVICE) private readonly client: ClientProxy) {}
 
   @Get()
+  @UseGuards(new RoleGuard(ROLE.ADMIN))
   findAll() {
     try {
       const response = this.client.send({ cmd: 'get-all-users' }, {});
@@ -23,7 +26,7 @@ export class UserController {
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.client.send({ cmd: 'get-user-by-id' }, id);
+    return this.client.send({ cmd: 'get-user' }, {id: id});
   }
 
   @Post()

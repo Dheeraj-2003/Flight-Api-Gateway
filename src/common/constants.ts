@@ -22,3 +22,4 @@ export const PATTERNS = {
   REGISTER: 'register',
   GET_USER_BY_ID: 'get_user_by_id',
 };
+
